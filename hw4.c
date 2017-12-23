@@ -10,28 +10,32 @@ void *readerThreads(void *t)
 	int i;
 	char* fileName;
 	fileName = (char*)t;
-	printf("Thread %ld starting\n", tid);
+	printf("Thread %s starting\n", fileName);
 	
 	
-	printf("Thread %ld done. Result = %d\n",tid, result);
+	printf("Thread %s done. \n",fileName);
 	pthread_exit((void*) t);
 }
 
 int main(int argc, char *argv[] ){
 	int outputFile;
 	char* outputFileName;
+	outputFileName = argv[1];
 	int filesNum = 0;
+	int t = 0;
+	int rc = 0;
 	pthread_t* thread;
+	char*
 
-	strcpy(outputFileName, argv[1]);
-	filesNum = argc-1;
+	filesNum = argc-2;
+	void *status;
 
 	printf("Hello, creating %s from %d input files\n", outputFileName , filesNum);
 	outputFile = open(outputFileName, O_WRONLY | O_TRUNC);
     thread = malloc(sizeof(pthread_t)*filesNum);
 	for(t=0; t<filesNum; t++)
 	{
-		printf("Main: creating thread %ld\n", t);
+		printf("Main: creating thread %d for filename: %s \n", t, argv[t+2]);
 		rc = pthread_create(&thread[t], NULL, readerThreads, (void *)argv[t+2]); 
 		if (rc)
 		{
@@ -40,7 +44,7 @@ int main(int argc, char *argv[] ){
 		}
 	}
 
-	for(t=0; t<NUM_THREADS; t++)
+	for(t=0; t<filesNum; t++)
 	{
 		rc = pthread_join(thread[t], &status);
 		if (rc)
@@ -48,5 +52,6 @@ int main(int argc, char *argv[] ){
 			printf("ERROR in pthread_join(): %s\n", strerror(rc));
 			exit(-1);
 		}
-		printf("Main: completed join with thread %ld having a status of %ld\n",t,(long)status);
+		printf("Main: completed join with thread %d having a status of %ld\n",t,(long)status);
 	}
+}
